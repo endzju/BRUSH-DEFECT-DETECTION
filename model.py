@@ -4,7 +4,7 @@ from utils import *
 import matplotlib as plt
 
 
-def predict(image, groundtruth_img=None):
+def predict(image):
     """Simple thresholding segmentation model.
 
     Args:
@@ -13,7 +13,6 @@ def predict(image, groundtruth_img=None):
     Returns:
         Binary mask as numpy array of shape (H, W), uint8 with values 0 or 255.
     """
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
     pattern_type = "median"
     pattern_gauss = False
@@ -37,22 +36,5 @@ def predict(image, groundtruth_img=None):
 
     gray_3ch = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
     mask_3ch = cv2.cvtColor(filtered_mask, cv2.COLOR_GRAY2BGR)
-    groundtruth_img = groundtruth_img.astype(np.uint8)
-    gt_3ch = cv2.cvtColor(groundtruth_img, cv2.COLOR_GRAY2BGR)
 
-    dim = (300, 300)
-
-    img_resized = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
-    gray_resized = cv2.resize(gray_3ch, dim, interpolation=cv2.INTER_AREA)
-    mask_resized = cv2.resize(mask_3ch, dim, interpolation=cv2.INTER_AREA)
-    gt_resized = cv2.resize(gt_3ch, dim, interpolation=cv2.INTER_AREA)
-
-    cv2.imshow('Original', img_resized)
-    cv2.imshow('Gray diff', gray_resized)
-    cv2.imshow('Mask', mask_resized)
-    cv2.imshow('Ground Truth', gt_resized)
-
-    key = cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    
-    return key == 27 # zwróć True dla Esc
+    return image, gray_3ch, mask_3ch
