@@ -36,7 +36,7 @@ def _get_patterns_dir():
     return Path(__file__).parent.resolve() / "pattern"
 
 
-def _load_pattern_cached(color: str, type_name: str = "mean"):
+def load_pattern_cached(color: str, type_name: str = "mean"):
     """Loads and caches the reference pattern from disk."""
     key = f"{color}_{type_name}"
     if key not in _PATTERNS_CACHE:
@@ -49,7 +49,7 @@ def _load_pattern_cached(color: str, type_name: str = "mean"):
     return _PATTERNS_CACHE[key]
 
 
-def _identify_brush_color(img_bgr: np.ndarray) -> str:
+def identify_brush_color(img_bgr: np.ndarray) -> str:
     """
     Identifies brush color by analyzing the Hue of the bristles in HSV space.
     Filters out the dark blue background by requiring high Saturation and Value.
@@ -68,7 +68,7 @@ def _identify_brush_color(img_bgr: np.ndarray) -> str:
         colors = ["blue", "red", "yellow"]
         sums = []
         for color in colors:
-            pattern = _load_pattern_cached(color, "mean")
+            pattern = load_pattern_cached(color, "mean")
             diff = np.abs(pattern.astype(np.int16) - img_bgr.astype(np.int16)).astype(np.uint8)
             sums.append(np.sum(diff))
         return colors[np.argmin(sums)]
@@ -186,8 +186,8 @@ def predict(image: np.ndarray, *args, params: dict = None, visualize: bool = Fal
     groundtruth_img: np.ndarray | None = args[0] if len(args) > 0 else None
     
     bgr = image
-    color = _identify_brush_color(bgr)
-    pattern = _load_pattern_cached(color, "mean")
+    color = identify_brush_color(bgr)
+    pattern = load_pattern_cached(color, "mean")
     
     raw_mask = _build_diff_mask(bgr, pattern, p['diff_threshold'], p['hsv_s_min'], p['hsv_v_min'])
     
@@ -226,8 +226,8 @@ def run_grid_search(images: list[np.ndarray], ground_truths: list[np.ndarray], s
 
     preped_data = []
     for img, gt in zip(images[::subset_step], ground_truths[::subset_step]):
-        color = _identify_brush_color(img)
-        pattern = _load_pattern_cached(color, "mean")
+        color = identify_brush_color(img)
+        pattern = load_pattern_cached(color, "mean")
         preped_data.append((img, pattern, gt))
 
     keys = param_grid.keys()
