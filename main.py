@@ -6,6 +6,8 @@ def main():
     good_path = script_dir / "toothbrush" / "train" / "good"
     defective_path = script_dir / "toothbrush" / "train" / "defective"
     ground_truth_path = script_dir / "toothbrush" / "ground_truth" / "defective"
+
+    init_colors()
     
     images = []
     ground_truths = []

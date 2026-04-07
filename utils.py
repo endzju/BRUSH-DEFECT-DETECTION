@@ -3,6 +3,20 @@ import numpy as np
 from pathlib import Path
 import os
 
+colors = ["blue", "red", "yellow"]
+means = []
+medians = []
+
+def init_colors():
+    script_dir = Path(__file__).parent.resolve()
+    mean_dir = script_dir / "pattern" / "mean"
+    median_dir = script_dir / "pattern" / "median"
+    for color in colors:
+        img_mean_path = mean_dir / (color+".png")
+        img_median_path = median_dir / (color+".png")
+        means.append(cv2.imread(img_mean_path))
+        medians.append(cv2.imread(img_median_path))
+
 def create_mean_median_mask(images: list[np.ndarray], color: str):
     script_dir = Path(__file__).parent.resolve()
     mean_dir = script_dir / "pattern" / "mean"
@@ -35,17 +49,6 @@ def create_mean_median_mask(images: list[np.ndarray], color: str):
     cv2.imwrite(str(median_gauss_file_path), median_gauss_output)
 
 def get_color(img: np.ndarray, median_or_mean: str) -> str:
-    colors = ["blue", "red", "yellow"]
-    means = []
-    medians = []
-    script_dir = Path(__file__).parent.resolve()
-    mean_dir = script_dir / "pattern" / "mean"
-    median_dir = script_dir / "pattern" / "median"
-    for color in colors:
-        img_mean_path = mean_dir / (color+".png")
-        img_median_path = median_dir / (color+".png")
-        means.append(cv2.imread(img_mean_path))
-        medians.append(cv2.imread(img_median_path))
     if median_or_mean == "mean":
         patterns = means
     elif median_or_mean == "median":
@@ -53,7 +56,7 @@ def get_color(img: np.ndarray, median_or_mean: str) -> str:
     else:
         raise ValueError("median_or_mean must be 'mean' or 'median'")
     sums = []
-    for pattern_img in means:
+    for pattern_img in patterns:
         diff = abs(pattern_img.astype(np.int16) - img.astype(np.int16)).astype(np.uint8)
         sums.append(np.sum(diff))
     color_idx = np.argmin(sums)
@@ -62,14 +65,11 @@ def get_color(img: np.ndarray, median_or_mean: str) -> str:
 def get_pattern(mean_or_median: str, color: str, gauss:bool=False) -> np.ndarray:
     if mean_or_median not in ['median', 'mean']:
         raise ValueError("median_or_mean must be 'mean' or 'median'")
-    if color not in ["blue", "red", "yellow"]:
+    if color not in colors:
         raise ValueError("color must be 'blue', 'red' or 'yellow'")
     script_dir = Path(__file__).parent.resolve()
     dir = script_dir / "pattern" / mean_or_median
-    name = color
-    if gauss:
-        name += "_gauss"
-    name += ".png"
+    name = f"{color}{'_gauss' if gauss else ''}.png"
     file_name = str(dir / name)
     img_pattern = cv2.imread(file_name)
     return img_pattern

@@ -9,9 +9,6 @@ def predict(image):
 
     Args:
         image: numpy array of shape (H, W, 3), uint8 RGB image.
-
-    Returns:
-        Binary mask as numpy array of shape (H, W), uint8 with values 0 or 255.
     """
 
     pattern_type = "median"
