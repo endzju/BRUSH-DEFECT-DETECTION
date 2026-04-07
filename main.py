@@ -15,7 +15,9 @@ def main():
         images.append(img)
         ground_truths.append(gt)
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        predict(img_rgb, gt) # Pass rgb image, gt is optional, only for visualization
+        stop = predict(img_rgb, gt) # Pass rgb image, gt is optional, only for visualization
+        if stop:
+            break
 
 if __name__ == "__main__":
     main()
